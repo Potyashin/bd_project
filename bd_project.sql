@@ -231,11 +231,11 @@ WHERE (v.company_id, v.city_nm) NOT IN
 WITH q AS (
   SELECT
     company_id,
-    product_mn
+    product_nm
   FROM
     Product_X_Company pxc INNER JOIN Product p
                                      ON pxc.product_id = p.product_id
-  WHERE product_mn = 'Maps'
+  WHERE product_nm = 'Maps'
 )
 SELECT
   c.company_nm
