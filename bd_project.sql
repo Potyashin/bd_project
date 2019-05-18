@@ -290,25 +290,26 @@ SELECT
 FROM
   Company c INNER JOIN q ON c.company_id = q.company_id;
 
---5 Запрос. Найти полную зарплату каждого сотрудника
+--5 Запрос. У всех всех компаний, у которых есть офисы в Китае, найти зарплату уборщика(Janitor) Со стажем 4 года
 WITH q AS
        (
-         SELECT DISTINCT e.full_name_nm,
-                         e.company_id,
-                         e.position_id,
-                         e.premium_amt,
-                         --max(p.salary_amt) OVER (PARTITION BY full_name_nm)
-                         max(p.work_record_value) OVER (PARTITION BY full_name_nm) AS wlv
-         FROM Employee e
-                INNER JOIN Position_X_Salary p on e.position_id = P.position_id AND e.company_id = p.company_id AND
-                                                  e.work_record_value > p.work_record_value
+         SELECT
+           company_id
+         FROM
+           Location
+         WHERE country_nm = 'China'
        )
 SELECT
-  q.full_name_nm,
-  q.premium_amt + p.salary_amt as sum_salary
+  (SELECT company_nm FROM Company c WHERE c.company_id = q.company_id) AS company_nm,
+  max(salary_amt) AS salary
 FROM
-  q INNER JOIN Position_X_Salary p on q.position_id = P.position_id AND q.company_id = p.company_id AND
-                                      q.wlv = p.work_record_value;
+  q INNER JOIN Position_X_Salary pxs
+  ON q.company_id = pxs.company_id
+WHERE
+  work_record_value <= 4 AND
+      pxs.position_id = (SELECT position_id FROM Position WHERE position_nm = 'Janitor')
+GROUP BY q.company_id;
+
 
 
 
